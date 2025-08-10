@@ -12,6 +12,12 @@
 
 <script lang="ts" setup>
 
+useHead({
+  title: '主页 | 流萤图站',
+  meta: [
+    { name: 'description', content: '主页 | 流萤图站' },
+  ],
+})
 const blurBG = ref(false)
 const allLoaded = ref(false)
 

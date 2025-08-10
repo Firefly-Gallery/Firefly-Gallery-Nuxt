@@ -38,6 +38,14 @@ import { closeWindow, closeCurrentWindow, popupComponents } from '@/components/P
 import ErrorLogModal from '@/components/Popup/ErrorLogModal.vue'
 import Loading from '@/components/Loading/Loading.vue'
 
+
+useHead({
+  title: '主页 | 流萤图站',
+  meta: [
+    { name: 'description', content: '主页 | 流萤图站' },
+  ],
+})
+
 const router = useRouter();
 
 const navbarRef = ref();

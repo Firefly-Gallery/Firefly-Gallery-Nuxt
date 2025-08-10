@@ -3,7 +3,7 @@
       <iframe src="/static/loading/firefly_icon_anim.html"/>
       <div id="loading_indicator" :class="{'loading_out': !loading}">
         <LoadingIcon :is-loading="true" />
-        <p>加载中... {{ loading }}</p>
+        <p>加载中...</p>
       </div>
     </div>
 </template>

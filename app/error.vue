@@ -1,6 +1,6 @@
 <template>
   <div class="error_root">
-    <Image src="/images/Common/Error_Emoji.gif" class="w-40 h-40"/>
+    <Image src="cdn://static/images/Common/Error_Emoji.gif" class="w-40 h-40"/>
     <h2 class="title">404</h2>
     <p class="desc">寻求的页面践行了『虚无』命途。</p>
     <Btn name="返回上一级 / 首页" class="btn_" @click="goBack"/>
@@ -21,6 +21,13 @@ const goBack = () => {
     router.back();
   }
 }
+
+useHead({
+  title: '页面不存在 | 流萤图站',
+  meta: [
+    { name: 'description', content: '页面不存在 | 流萤图站' },
+  ],
+})
 </script>
 <style scoped lang="postcss">
 

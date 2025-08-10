@@ -6,13 +6,6 @@
         <h1>流萤图站</h1>
       </div>
     </div>
-    <div class="flex flex-rol justify-center items-center flex-wrap mb-16 gap-2">
-      <img alt="Static Badge" src="https://img.shields.io/badge/5.2.2-21af90?style=flat&logo=vite&logoColor=8976fe&label=Vite&color=8976fe">
-      <img alt="Static Badge" src="https://img.shields.io/badge/3.4.21-21af90?style=flat&logo=Vue.js&logoColor=42d392&label=Vue&color=42d392">
-      <img alt="Static Badge" src="https://img.shields.io/badge/20.11.1-21af90?style=flat&logo=Node.js&logoColor=68ca5a&label=Node.js&color=68ca5a">
-      <img alt="Static Badge" src="https://img.shields.io/badge/10.2.5-21af90?style=flat&logo=npm&logoColor=c90000&label=npm&color=c90000">
-
-    </div>
     <div class="content flex flex-col xl:flex-row items-center justify-around gap-10">
       <div class="grow max-w-[820px] flex flex-col min-h-[100vh]">
         <div class="quote">
@@ -35,7 +28,7 @@ target="_blank"
           当然网站主体还是以厨为主（连角色介绍都有了），重点看个人理解罢。<br>
           总而言之，希望大家玩的开心！<br>
         </div>
-        <Image class="mt-16 rounded-box shadow-lg" src="https://image-cdn.firefly-gallery.cn/pixiv/115952605_p0.jpg"/>
+        <Image class="mt-16 rounded-box shadow-lg" src="cdn://pixiv/115952605_p0.jpg"/>
 
       </div>
       <div class="sidebar">
@@ -74,6 +67,14 @@ target="_blank"
 
 <script lang="ts" setup>
 import Image from '@/components/UI/Image.vue'
+
+
+useHead({
+  title: '关于 | 流萤图站',
+  meta: [
+    { name: 'description', content: '关于 | 流萤图站' },
+  ],
+})
 </script>
 <style lang="postcss" scoped>
 .chat-bubble::before {
@@ -85,7 +86,7 @@ import Image from '@/components/UI/Image.vue'
   justify-center items-center my-8;
 }
 .title {
-  @apply gap-5
+  @apply gap-5 mb-4
   flex flex-col justify-center;
 }
 .title h1 {

@@ -1,6 +1,6 @@
 <template>
   <ParallaxContainer
-ref="portraitLayer" :src="'/images/Introduction/AvatarPortrait.png'"
+ref="portraitLayer" :src="'cdn://static/images/Introduction/AvatarPortrait.png'"
   :extra-content="spineLoaded" :content-class="'content-nodark'" :margin="300" :image-z="0">
     <template #content>
       <iframe ref="spineAnim" class="w-full h-screen"/>
@@ -9,11 +9,11 @@ ref="portraitLayer" :src="'/images/Introduction/AvatarPortrait.png'"
     <div class="chardesc-container">
         <div class="Up">
             <div class="char-name-block">
-              <Image src="/images/Introduction/FireflyIconWhite.svg" :other-formats="[]" class="h-[200px] min-w-[350px] drop-shadow-md" />
+              <Image src="cdn://static/images/Introduction/FireflyIconWhite.svg" :other-formats="[]" class="h-[200px] min-w-[350px] drop-shadow-md" />
                 <div class="icons">
-                    <Image src="/images/Introduction/FiveStarsIcon.svg" class="h-7 min-w-[110px] drop-shadow-md" :other-formats="[]" />
-                    <Image src="/images/Introduction/FireIcon.png" class="w-10 h-10 drop-shadow-md" />
-                    <Image src="/images/Introduction/DestinyIcon.png" class="w-10 h-10 drop-shadow-md" />
+                    <Image src="cdn://static/images/Introduction/FiveStarsIcon.svg" class="h-7 min-w-[110px] drop-shadow-md" :other-formats="[]" />
+                    <Image src="cdn://static/images/Introduction/FireIcon.png" class="w-10 h-10 drop-shadow-md" />
+                    <Image src="cdn://static/images/Introduction/DestinyIcon.png" class="w-10 h-10 drop-shadow-md" />
                 </div>
             </div>
             <div class="top-right">
@@ -57,7 +57,7 @@ ref="portraitLayer" :src="'/images/Introduction/AvatarPortrait.png'"
                     class="btn2" 
                     @click="openWindow('imageViewer', {
                       title: '立绘',
-                      'src': ['/images/Introduction/AvatarPortrait.png', '/images/Introduction/AvatarPoster2.jpg', '/images/Introduction/AvatarPoster1.jpg']
+                      'src': ['cdn://static/images/Introduction/AvatarPortrait.png', 'cdn://static/images/Introduction/AvatarPoster2.jpg', 'cdn://static/images/Introduction/AvatarPoster1.jpg']
                     })">
                       <Icon name="heroicons:arrows-pointing-out" class="h-6 w-6 text-white" />
                     </button>

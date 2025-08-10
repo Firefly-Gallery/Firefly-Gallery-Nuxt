@@ -1,12 +1,18 @@
 <template>
     <Common-ParallaxContainer
-        :src="'/images/Introduction/Background_00.png'"
+        :src="'cdn://static/images/Introduction/Background_00.png'"
         :content-class="'no-dark'" :margin="512">
         <Profile-CharacterDescription />
     </Common-ParallaxContainer>
 </template>
 
 <script lang="ts" setup>
+useHead({
+  title: '简介 | 流萤图站',
+  meta: [
+    { name: 'description', content: '简介 | 流萤图站' },
+  ],
+})
 </script>
 
 <style lang="postcss">

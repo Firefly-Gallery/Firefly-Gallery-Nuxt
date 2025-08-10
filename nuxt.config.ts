@@ -9,6 +9,13 @@ export default defineNuxtConfig({
       htmlAttrs: {
         'data-theme': 'dark',
       },
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: '/images/icon/LiuYingPure.svg'
+        }
+      ]
     }
   },
   postcss: {

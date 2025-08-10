@@ -1,7 +1,7 @@
 <template>
   <footer>
     <div class="footer-graphic">
-      <Image src="/images/Common/FooterIcon.png" class="site-icon" />
+      <Image src="cdn://static/images/Common/FooterIcon.png" class="site-icon" />
     </div>
     <div class="footer-item info-container">
       <h2 class="title">流萤图站</h2>
