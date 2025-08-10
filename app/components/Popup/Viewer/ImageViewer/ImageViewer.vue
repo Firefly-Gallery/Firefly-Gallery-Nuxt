@@ -1,0 +1,395 @@
+<template>
+  <Viewer :index="props.index" :show="props.show" @close="close" :hideBars="hideBars" :loaded="loaded">
+    <template v-slot:title>
+      <Icon name="heroicons:photo" class="logo" />
+      <span class="title-text">{{ imageViewerData.title }}</span>
+    </template>
+    <template v-slot:top_right>
+      <a class="download-link" @click="downloadImage">
+      </a>
+    </template>
+
+    <template v-slot:middle>
+      <div class="image-switch-container">
+        <div id="switch-left"
+          :class="`image-switch ${imageViewerData.currentPage == 0 || pageCount <= 1? 'disable':''}`"
+          @click="imageViewerData.currentPage -= 1">
+          <svg width="32" height="57" viewBox="0 0 32 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 54L28.622 29.3566C28.8283 29.1619 28.8316 28.8347 28.629 28.636L2.5 3" stroke="white" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="5" cy="29" r="5" transform="rotate(-90 5 29)" fill="white"/>
+          </svg>
+        </div>
+        <div id="switch-right"
+          :class="`image-switch ${imageViewerData.currentPage >= pageCount-1? 'disable':''}`"
+          @click="imageViewerData.currentPage += 1">
+          <svg width="32" height="57" viewBox="0 0 32 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 54L28.622 29.3566C28.8283 29.1619 28.8316 28.8347 28.629 28.636L2.5 3" stroke="white" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="5" cy="29" r="5" transform="rotate(-90 5 29)" fill="white"/>
+          </svg>
+        </div>
+      </div>
+      <div class="image-info-container">
+        <div 
+          :class="{'image-info': true, 'detail': showDetails, 'backgrop-blur-lg': enable_blur}" 
+          ref="infoContainer"
+          :animate="{ 
+            width: 'auto',
+            height: 'auto'
+          }"
+          :transition="{
+            duration: 0.4,
+            ease: showDetails ? 'backOut' : 'easeOut'
+          }"
+          :layout="true"
+        >
+          <p v-if="showDetails" class="m-3 mt-4">
+            画师：@{{ imageAuthor }}
+          </p>
+          <p v-if="showDetails" class="m-3">
+            原链接：<a class="underline text-secondary" target="_blank" :href="imageLink">{{ imageLink }}</a>
+          </p>
+          <div class="info-bottom">
+            <p class="page-indicator">
+              {{imageViewerData.currentPage+1}} / {{pageCount}}
+            </p>
+            <div class="flex flex-nowrap">
+              <a class="btn btn-circle btn-sm btn-ghost" @click="downloadImage">
+                <Icon name="heroicons:arrow-down-tray" class="h-5 w-5" />
+              </a>
+              <button class="btn btn-circle btn-sm btn-ghost" :disabled="isAnimating"
+                      @click="toggleDetails()" v-if="imageViewerData.artwork">
+                <Icon name="heroicons:ellipsis-vertical" class="h-6 w-6"/>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <div class="viewer-container" ref="imageContainerRef">
+      <PinchScrollZoom
+        ref="zoomer"
+        within
+        key-actions
+        :width="scrWidth"
+        :height="scrHeight"
+        @scaling="e => onEvent('scaling', e)"
+        @startDrag="e => onEvent('startDrag', e)"
+        @stopDrag="e => onEvent('stopDrag', e)"
+        @dragging="e => onEvent('dragging', e)"
+        :min-scale="1"
+        :max-scale="6"
+        :class="`zoomer ${loaded? '':'disable'}`"
+      >
+        <img :src="currentImageUrl" alt="无法加载图片..." @load="loaded=true">
+      </PinchScrollZoom>
+    </div>
+  </Viewer>
+</template>
+
+<script lang="ts" setup>
+import './PinchScrollZoom/psz.css';
+import Viewer from '../Common/Viewer.vue';
+import { imageViewerData } from './'
+import PinchScrollZoom from './PinchScrollZoom/pinch-scroll-zoom.vue'
+import type { PinchScrollZoomEmitData, PinchScrollZoomExposed } from './PinchScrollZoom/types';
+import { useAnimate } from 'motion-v';
+import type { Artwork } from '~/utils/artworks'
+import { formatSrcURL } from '~/utils/artworks'
+import { motion } from 'motion-v';
+
+const { enable_blur } = useSettings()
+const [scope, animate] = useAnimate();
+const infoContainer = ref();
+
+// Much simpler toggle function with declarative animation
+const toggleDetails = () => {
+  if (!infoContainer.value) return;
+  
+  isAnimating.value = true;
+  showDetails.value = !showDetails.value;
+  
+  // The animation is handled declaratively by the motion component
+  // Just need to manage the animation state
+  setTimeout(() => {
+    isAnimating.value = false;
+  }, 400); // Match the animation duration
+};
+
+// Remove the resetStyles function - not needed with motion-vue
+
+const zoomer = ref<PinchScrollZoomExposed>();
+
+const scrWidth = ref<number>(1920);
+const scrHeight = ref<number>(960);
+const pageCount = ref<number>(0);
+
+const hideBars = ref<boolean>(false);
+const showDetails = ref<boolean>(false);
+const isAnimating = ref<boolean>(false);
+
+const imageAuthor = ref<string>("Unset")
+const imageLink = ref<string>("Unset")
+
+const UpdateScreenSize = () => {
+  scrWidth.value = window.innerWidth;
+  scrHeight.value = window.innerHeight;
+}
+onMounted(() => {
+  imageViewerData.currentPage = 0;
+  UpdateScreenSize();
+  window.addEventListener('resize', UpdateScreenSize)
+})
+
+const state = reactive({
+  eventName: "",
+  scale: 0,
+  originX: 0,
+  originY: 0,
+  translateX: 0,
+  translateY: 0,
+})
+
+function onEvent(name: string, e: PinchScrollZoomEmitData): void {
+  state.eventName = name;
+  state.scale = e.scale;
+  state.originX = e.originX;
+  state.originY = e.originY;
+  state.translateX = e.translateX;
+  state.translateY = e.translateY;
+  if(state.scale==1 && hideBars.value) {
+    hideBars.value = false;
+  } else if (state.scale > 1 && !hideBars.value) {
+    hideBars.value = true;
+  }
+}
+
+const loaded = ref(false);
+const currentImageUrl = computed(() => {
+  // Retrieve the image URL based on the current index value
+  if(!imageViewerData.src) return "";
+  const src = imageViewerData.src[imageViewerData.currentPage];
+  if(!src) return "";
+  const img = useImage()
+  const processedSrc = img(src.replace('cdn://', '/'), {}, {provider: src.startsWith('cdn://') ? 'aliyun':'ipx'})
+  return processedSrc;
+});
+
+// Watch for artwork item changes to fetch details
+watch(() => imageViewerData.artworkItem, async (newArtworkItem) => {
+  
+  if (!newArtworkItem) return;
+  
+  try {
+    const {data: artwork} = await useFetch<Artwork>(`/api/detail/${newArtworkItem.id}`, {
+      key: `artwork-${newArtworkItem.id}`,
+      server: false
+    })
+    
+    if (artwork.value) {
+      imageViewerData.artwork = artwork.value;
+      const images: string[] = []
+      imageViewerData.artwork.img.forEach((i) => {
+        images.push(i)
+      })
+      imageViewerData.src = images;
+      imageAuthor.value = imageViewerData.artwork.author;
+      imageLink.value = formatSrcURL(imageViewerData.artwork.src);
+      imageViewerData.title = imageViewerData.artwork.id
+    }
+  } catch (error) {
+    console.error('Failed to load artwork details:', error)
+  }
+});
+
+// Watch for src changes to update page info
+watch(() => imageViewerData.src, (newSrc) => {
+  
+  if (!newSrc) return;
+  
+  // If src list is set but artworkItem is empty, hide details
+  if (!imageViewerData.artworkItem && showDetails.value) {
+    toggleDetails();
+  }
+  
+  pageCount.value = newSrc.length;
+  imageViewerData.currentPage = 0;
+  loaded.value = false;
+});
+
+const saveAsBlob = (imageUrl:string, filename:string) => {
+  fetch(imageUrl, {
+    method: "GET",
+  }).then(response => {
+      return response.blob()
+    })
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename; // Set the desired file name
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    })
+    .catch(err => console.error('Failed to download image', err));
+}
+
+const props = withDefaults(
+defineProps<{
+  show?: boolean
+  name: string
+  index: number
+}>(),
+  {
+    show: true
+  }
+)
+
+const imageContainerRef = ref();
+
+const downloadImage = () => {
+  if(!imageViewerData.src) return "";
+  const imageSrc = imageViewerData.src[imageViewerData.currentPage]
+  if(!imageSrc) return;
+  const imageName = imageSrc.substring(imageSrc.lastIndexOf('/')+1)
+  saveAsBlob(imageSrc, imageName);
+}
+
+const emits = defineEmits<{
+  (event: 'close', name: string): void
+}>()
+
+const close = () => {
+  emits('close', props.name)
+}
+</script>
+
+<style lang="stylus" scoped>
+.logo
+  @apply w-10 h-10 p-2 rounded-full;
+  background-color #f1f1f1
+  color black
+span.title-text
+  color white
+  @apply text-xl;
+
+a.download-link
+  cursor pointer
+  transition: color 250ms ease, scale 250ms ease
+  &:hover
+    scale 1.1
+  &:active
+    scale 0.9
+    color #5ab5ac
+
+.viewer-container
+  transition all 350ms ease
+  width 100%
+  height 100%
+  overflow auto
+  display flex
+  justify-content center
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 0 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #545454;
+  }
+.image-switch-container
+  width 100%
+  height 100%
+  display flex
+  justify-content space-between
+  .image-switch
+    transition all 250ms ease
+    pointer-events auto
+    cursor pointer
+    width 75px
+    display flex
+    justify-content center
+    align-items center
+    &#switch-left
+      transform rotate(180deg)
+    svg
+      filter: drop-shadow(0px 3px 6px black)
+      scale 0.7
+    &:hover
+      background-color #ffffff20
+      svg
+        filter: drop-shadow(0px 3px 6px orange)
+        scale 0.9
+        transform translateX(4px)
+
+      path
+        stroke orange
+      circle
+        //scale 0.7
+        fill #ffb739
+    &:active
+      background-color #ffffff10
+      svg
+        scale 0.7
+        transform translateX(2px)
+
+      path
+        stroke #a26b00
+      circle
+        fill #a26b00
+    *
+      transition all 350ms cubic-bezier(0, 0, 0, 1)
+
+.image-info-container
+  @apply absolute bottom-0 left-0 right-0 flex justify-center items-center;
+  z-index 100
+  .image-info
+    @apply m-3 bg-base-200/75 rounded-3xl p-2 flex flex-col justify-end items-stretch;
+
+    box-shadow 0 7px 17px 0 #000000c2
+    pointer-events all
+    overflow hidden
+    >p
+      overflow hidden
+      white-space nowrap
+      //text-overflow ellipsis
+      transition all 250ms ease;
+    .info-bottom
+      @apply flex justify-between items-center gap-2
+      .page-indicator
+        overflow none
+        white-space nowrap
+        @apply px-4 pb-1;
+
+    &.detail
+      .info-bottom
+        @apply mt-2;
+        .page-indicator
+          @apply px-3;
+
+
+
+.disable
+  pointer-events none!important
+  opacity 0
+.zoomer
+  transition opacity 150ms ease
+</style>
+<style lang="stylus">
+.pinch-scroll-zoom__content
+  display flex
+  flex-direction row
+  justify-content center
+  transition all 100ms ease
+  img
+    width auto
+    height 100%
+    object-fit contain
+</style>
