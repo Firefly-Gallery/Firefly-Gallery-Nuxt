@@ -273,7 +273,8 @@ const close = () => {
   color black
 span.title-text
   color white
-  @apply text-xl;
+  max-width 60vw
+  @apply text-xl truncate;
 
 a.download-link
   cursor pointer

@@ -9,11 +9,11 @@ ref="portraitLayer" :src="'cdn://static/images/Introduction/AvatarPortrait.png'"
     <div class="chardesc-container">
         <div class="Up">
             <div class="char-name-block">
-              <Image src="cdn://static/images/Introduction/FireflyIconWhite.svg" :other-formats="[]" class="h-[200px] min-w-[350px] drop-shadow-md" />
+              <Image src="cdn://static/images/Introduction/FireflyIconWhite.svg" :other-formats="[]" class="h-[100px] sm:h-[150px] md:h-[200px] drop-shadow-md" />
                 <div class="icons">
-                    <Image src="cdn://static/images/Introduction/FiveStarsIcon.svg" class="h-7 min-w-[110px] drop-shadow-md" :other-formats="[]" />
-                    <Image src="cdn://static/images/Introduction/FireIcon.png" class="w-10 h-10 drop-shadow-md" />
-                    <Image src="cdn://static/images/Introduction/DestinyIcon.png" class="w-10 h-10 drop-shadow-md" />
+                    <Image src="cdn://static/images/Introduction/FiveStarsIcon.svg" class="h-4 md:h-7 drop-shadow-md" :other-formats="[]" />
+                    <Image src="cdn://static/images/Introduction/FireIcon.png" class="h-4 md:h-10 drop-shadow-md" />
+                    <Image src="cdn://static/images/Introduction/DestinyIcon.png" class="h-4 md:h-10 drop-shadow-md" />
                 </div>
             </div>
             <div class="top-right">
@@ -171,11 +171,11 @@ iframe {
     @apply w-full md:w-auto p-2;
 }
 .icons {
-    @apply flex flex-row items-center h-8 ml-2 my-5 gap-3;
+    @apply flex flex-row items-center h-4 md:h-8 ml-2 my-2 md:my-5 gap-3;
 }
 .quote {
     @apply relative z-[10] pb-1 md:pb-[15px]
-    text-lg md:text-lg lg:text-xl;
+    text-sm sm:text-base md:text-lg lg:text-xl;
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.51);
     color: #ffffff;
     font-weight: 700;
@@ -208,7 +208,7 @@ p.char-name-sub {
     font-family: Hanyiwenhei, Arial, sans-serif;
 }
 .char-description {
-    @apply p-5 bg-[#00000050] border-2 border-black w-full lg:w-auto;
+    @apply text-xs sm:text-base p-5 bg-[#00000050] border-2 border-black w-full lg:w-auto;
 }
 .btn2 {
     @apply btn btn-ghost grow btn-sm lg:btn-md lg:w-auto lg:px-5;
@@ -217,12 +217,15 @@ p.char-name-sub {
     @apply flex flex-col-reverse lg:flex-col w-full lg:w-auto items-stretch lg:items-end gap-3;
 }
 table {
-    @apply w-full lg:w-auto;
+    @apply hidden sm:table w-full lg:w-auto;
     background-color: #00000050;
     border: 2px solid #000000;
     color: #fff;
     min-width: 300px;
     border-radius: 0;
+}
+table>tbody>tr {
+    @apply border-b border-black;
 }
 table>tr>th, table>*>tr>th {
     background-color: rgba(0, 0, 0, 0.37);
