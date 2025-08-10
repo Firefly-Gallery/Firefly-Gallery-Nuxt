@@ -1,5 +1,4 @@
-import fs from 'fs'
-import path from 'path'
+import { artworks } from "../data/artwork";
 
 interface ArtworkItem {
   author: string;
@@ -11,40 +10,15 @@ interface ArtworkItem {
   time: number;
 }
 
-interface ArtworkData {
-  _default: Record<string, ArtworkItem>
-}
-
 class ArtworkDataLoader {
   private artworks: ArtworkItem[] = []
   private artworksById: Map<string, ArtworkItem> = new Map()
   private isLoaded = false
 
   constructor() {
-    this.loadData()
-  }
-
-  private loadData() {
-    try {
-      const dataPath = path.join(process.cwd(), 'server/data/artwork.json')
-      const rawData = fs.readFileSync(dataPath, 'utf-8')
-      const artworkData: ArtworkData = JSON.parse(rawData)
-      
-      // Convert to array and create lookup map
-      this.artworks = Object.values(artworkData._default)
-      
-      // Create fast lookup by ID
-      this.artworksById = new Map()
-      this.artworks.forEach(artwork => {
-        this.artworksById.set(artwork.id, artwork)
-      })
-      
-      this.isLoaded = true
-      console.log(`Loaded ${this.artworks.length} artworks into memory`)
-    } catch (error) {
-      console.error('Failed to load artwork data:', error)
-      throw error
-    }
+    this.artworks = Object.values(artworks._default)
+    this.artworksById = new Map(this.artworks.map(artwork => [artwork.id, artwork]))
+    this.isLoaded = true
   }
 
   public getAllArtworks(): ArtworkItem[] {
